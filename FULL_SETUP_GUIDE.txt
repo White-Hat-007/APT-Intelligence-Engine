@@ -1,0 +1,244 @@
+═══════════════════════════════════════════════════════════════════════════════
+FULL SETUP GUIDE - CONNECT ALL 7 CONNECTORS WITH MOCK INFRASTRUCTURE
+═══════════════════════════════════════════════════════════════════════════════
+
+OVERVIEW:
+You will:
+1. Start mock infrastructure servers (REST API, WebSocket, Splunk)
+2. Deploy all 7 connectors configured to use mock infrastructure
+3. Send test events through syslog
+4. Watch everything work together end-to-end
+
+═══════════════════════════════════════════════════════════════════════════════
+STEP 1: START MOCK INFRASTRUCTURE (Terminal #1)
+═══════════════════════════════════════════════════════════════════════════════
+
+Run this command (starts 3 servers in background):
+
+  python setup_infrastructure.py
+
+You should see:
+  [startup] Starting Mock infrastructure...
+  [mock-rest-api] Starting Mock REST API Server
+  [mock-splunk] Starting Mock Splunk Instance
+  [mock-websocket] Starting Mock WebSocket Server
+  
+  ✓ Infrastructure running. Press Ctrl+C to stop all servers.
+
+KEEP THIS TERMINAL OPEN! Don't close it.
+
+═══════════════════════════════════════════════════════════════════════════════
+STEP 2: DEPLOY ALL 7 CONNECTORS (Terminal #2 - NEW TERMINAL)
+═══════════════════════════════════════════════════════════════════════════════
+
+In a NEW PowerShell window, run these commands IN ORDER:
+
+1. Set environment variables to use mock infrastructure:
+
+   $env:SPLUNK_HOST='localhost:8089'
+   $env:SPLUNK_USER='admin'
+   $env:SPLUNK_PASSWORD='admin'
+   $env:REST_API_URL='http://localhost:8443/v1/events'
+   $env:WEBSOCKET_URL='wss://localhost:8443/stream'
+   $env:KAFKA_BROKERS='localhost:9092'
+   $env:ELASTIC_HOSTS='localhost:9200'
+   $env:SYSLOG_HOST='localhost'
+   $env:SYSLOG_PORT='514'
+
+2. Deploy all 7 connectors:
+
+   python run_connector_advanced.py 4
+
+You should see:
+  [+] Scenario: Modern SOC (All Connectors)
+  [+] Running 7 connector(s)...
+  
+  [splunk] Starting...
+  [splunk] Connected to localhost:8089
+  
+  [rest] Starting...
+  [REST API] Starting poll from http://localhost:8443/v1/events
+  
+  [websocket] Starting...
+  [WebSocket] Connecting to wss://localhost:8443/stream...
+  
+  [syslog] Starting...
+  [Syslog] Listening on 0.0.0.0:514 (TCP)
+  
+  [elastic] Starting...
+  [elasticsearch] Connecting to ['localhost:9200']
+  
+  [kafka] Starting...
+  [Kafka] Connecting to ['localhost:9092']
+  
+  [windows_eventlog] Starting...
+  [Windows EventLog] Monitoring Security log
+
+KEEP THIS TERMINAL OPEN! Events are being collected.
+
+═══════════════════════════════════════════════════════════════════════════════
+STEP 3: SEND TEST EVENTS (Terminal #3 - NEW TERMINAL)
+═══════════════════════════════════════════════════════════════════════════════
+
+In a THIRD PowerShell window, send syslog events:
+
+  python send_syslog.py localhost 514 10
+
+You should see:
+  ✓ Sent: 10 events
+  ✗ Failed: 0
+
+In Terminal #2, you should see events appearing:
+  [syslog] Event #1: WORKSTATION-01 | ProcessCreate | T1086
+  [syslog] Event #2: WORKSTATION-01 | NetworkConnection | T1071
+  [syslog] Event #3: WORKSTATION-01 | FileCreate | T1547
+  ... (10 total)
+
+═══════════════════════════════════════════════════════════════════════════════
+WHAT'S HAPPENING NOW
+═══════════════════════════════════════════════════════════════════════════════
+
+Terminal #1 (Infrastructure):
+  ✓ Mock REST API Server     - Simulating security event API
+  ✓ Mock WebSocket Server    - Broadcasting threat alerts
+  ✓ Mock Splunk              - Simulating Splunk instance
+  
+Terminal #2 (Connectors):
+  ✓ REST API Connector       - Polling mock API every 10 seconds
+  ✓ WebSocket Connector      - Connected to mock WebSocket
+  ✓ Splunk Connector         - Pulling events from mock Splunk
+  ✓ Syslog Connector         - Listening on port 514
+  ✓ Windows Event Log         - Reading local Windows Security logs
+  ✓ Kafka Connector          - Waiting for broker (optional)
+  ✓ Elasticsearch Connector  - Waiting for cluster (optional)
+  
+Terminal #3 (Test Data):
+  → Sending sample security events via syslog
+
+Flow: Test Events → Syslog → Ingestor → Analytics → Reports
+
+═══════════════════════════════════════════════════════════════════════════════
+EXPECTED OUTPUT IN TERMINAL #2
+═══════════════════════════════════════════════════════════════════════════════
+
+After 5-10 seconds, you should see:
+
+[+] Launching splunk...
+[splunk] Connected! Processing events...
+[splunk] Event #1: WORKSTATION-01 | ProcessCreate | T1086 | 2026-02-27T10:15:30Z
+
+[+] Launching rest...
+[REST API] Polling http://localhost:8443/v1/events
+[rest] Event #1: WORKSTATION-01 | NetworkConnection | T1071 | 2026-02-27T10:15:31Z
+
+[+] Launching websocket...
+[websocket] Connected to stream
+[websocket] Alert: "Suspicious PowerShell Execution Detected"
+
+[+] Launching syslog...
+[syslog] Event #1: WORKSTATION-01 | ProcessCreate | T1086 | 2026-02-27T10:15:30Z
+[syslog] Batch #1 processed: 10 events
+
+... (events from all connectors appear as they arrive)
+
+═══════════════════════════════════════════════════════════════════════════════
+ADVANCED: ADD REAL KAFKA/ELASTICSEARCH (Optional - Requires Docker)
+═══════════════════════════════════════════════════════════════════════════════
+
+IF YOU HAVE DOCKER INSTALLED:
+
+1. Start Kafka:
+   docker run -d --name kafka-zk -p 2181:2181 \\
+     -e ZOOKEEPER_CLIENT_PORT=2181 \\
+     confluentinc/cp-zookeeper:latest
+   
+   docker run -d --name kafka -p 9092:9092 \\
+     -e KAFKA_BROKER_ID=1 \\
+     -e KAFKA_ZOOKEEPER_CONNECT=kafka-zk:2181 \\
+     -e KAFKA_ADVERTISED_LISTENERS=PLAINTEXT://localhost:9092 \\
+     -e KAFKA_OFFSETS_TOPIC_REPLICATION_FACTOR=1 \\
+     confluentinc/cp-kafka:latest
+
+2. Start Elasticsearch:
+   docker run -d --name elasticsearch \\
+     -e discovery.type=single-node \\
+     -e xpack.security.enabled=false \\
+     -p 9200:9200 \\
+     docker.elastic.co/elasticsearch/elasticsearch:7.15.0
+
+3. The connectors will automatically connect when you deploy Scenario 4
+
+═══════════════════════════════════════════════════════════════════════════════
+IF SOMETHING DOESN'T WORK
+═══════════════════════════════════════════════════════════════════════════════
+
+Problem: "Connection refused" for REST API
+Solution: Make sure setup_infrastructure.py is still running in Terminal #1
+
+Problem: "Port 514 already in use"
+Solution: Another syslog is running. Use: python send_syslog.py localhost 5514
+         And update environment: $env:SYSLOG_PORT='5514'
+
+Problem: Kafka/Elasticsearch showing connection errors
+Solution: This is normal! They're optional. Just ignore those errors.
+          Or install Docker and start them (see above).
+
+Problem: Windows Event Log showing permission denied
+Solution: Run PowerShell as Administrator for full access
+          Or ignore - it's optional
+
+═══════════════════════════════════════════════════════════════════════════════
+COMPLETE ARCHITECTURE
+═══════════════════════════════════════════════════════════════════════════════
+
+Event Sources (Mock Infrastructure)
+├── REST API (localhost:8443)      → Events about processes, networks, files
+├── WebSocket (localhost:8443)     → Real-time threat alerts
+├── Splunk (localhost:8089)        → Windows Event Log data
+├── Syslog (localhost:514)         ← Test events you send
+├── Windows Event Log              → Local security events
+├── Kafka (if Docker installed)    → Message broker
+└── Elasticsearch (if Docker)      → Centralized logs
+
+                    ↓
+
+         Real-Time Ingestor (Thread-Safe)
+          - Receives from all 7 sources
+          - Normalizes events
+          - Batches: 10 events OR 3 seconds
+          - Non-blocking processing
+
+                    ↓
+
+          Analytics Engine
+          ├─ Fingerprinting     → Extract unique behaviors
+          ├─ Similarity         → Find related events
+          ├─ Graph Building     → Create attack chains
+          ├─ Clustering         → Group campaigns
+          └─ MITRE Mapping      → Map to ATT&CK framework
+
+                    ↓
+
+         Intelligence Reports
+          - Campaign summaries
+          - Threat scores
+          - Actor attribution
+          - Indicators of Compromise (IOCs)
+
+═══════════════════════════════════════════════════════════════════════════════
+NEXT STEPS
+═══════════════════════════════════════════════════════════════════════════════
+
+1. Run the setup as described above ✓
+2. Verify all connectors connect successfully
+3. Watch events flow through the system
+4. Check Terminal #1 to see infrastructure logs
+5. Check the generated reports: reporting/intelligence_report.json
+6. Try sending more events: python send_syslog.py localhost 514 50
+7. Increase throughput by running multiple instances in parallel
+
+═══════════════════════════════════════════════════════════════════════════════
+
+Ready? Start with: python setup_infrastructure.py
+
+═══════════════════════════════════════════════════════════════════════════════

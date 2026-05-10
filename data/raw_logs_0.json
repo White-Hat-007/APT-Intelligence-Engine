@@ -1,0 +1,58 @@
+[
+    {
+        "event_id": "e25828eb-c225-4ce4-877e-69ce36515e77",
+        "timestamp": "2026-02-25 15:53:34.923622+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "event_id": "a056aeb2-1f45-4329-b156-1af1228ffaa5",
+        "timestamp": "2026-02-25 15:53:34.923622+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "event_id": "8a79edfb-ecc6-4fa2-a308-96c598ccb8cc",
+        "timestamp": "2026-02-25 15:53:34.923622+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1547",
+        "technique_name": "Boot or Logon Autostart Execution"
+    },
+    {
+        "event_id": "607f9228-8fcd-40dc-90c4-4112e82cbd50",
+        "timestamp": "2026-02-25 15:53:34.923622+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1003",
+        "technique_name": "Credential Dumping"
+    },
+    {
+        "event_id": "bdfbe5fb-1c31-435a-ab5b-77df6ff3315d",
+        "timestamp": "2026-02-25 15:53:34.923622+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "event_id": "edd0d07d-bf23-43a0-a7af-f5b038cd1e6d",
+        "timestamp": "2026-02-25 15:53:34.923622+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "event_id": "4c268ce0-6051-49a4-9cf8-a700e652c16a",
+        "timestamp": "2026-02-25 15:53:34.923622+00:00",
+        "host": "HOST-2",
+        "technique_id": "T1041",
+        "technique_name": "Exfiltration Over C2 Channel"
+    },
+    {
+        "event_id": "be17e0de-161a-46e9-856c-974e06717881",
+        "timestamp": "2026-02-25 15:53:34.923622+00:00",
+        "host": "HOST-2",
+        "technique_id": "T1041",
+        "technique_name": "Exfiltration Over C2 Channel"
+    }
+]

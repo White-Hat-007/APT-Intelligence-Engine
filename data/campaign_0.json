@@ -1,0 +1,74 @@
+[
+    {
+        "campaign_id": 0,
+        "event_id": "5aa951c2-6156-4642-a933-d700577ca791",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-1",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "campaign_id": 0,
+        "event_id": "ac5d36ed-9478-452b-be75-7dd6c05e0a2b",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-2",
+        "technique_id": "T1059",
+        "technique_name": "Command and Scripting Interpreter"
+    },
+    {
+        "campaign_id": 0,
+        "event_id": "1e3a12c8-a295-49c5-a14a-afc0a312ec34",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1003",
+        "technique_name": "Credential Dumping"
+    },
+    {
+        "campaign_id": 0,
+        "event_id": "e95abbc2-d981-498e-923c-8b0821f56076",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1003",
+        "technique_name": "Credential Dumping"
+    },
+    {
+        "campaign_id": 0,
+        "event_id": "0243a14f-fdf5-4415-b996-b8b95be87917",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1547",
+        "technique_name": "Boot or Logon Autostart Execution"
+    },
+    {
+        "campaign_id": 0,
+        "event_id": "634ef342-7e59-4388-bc0a-336a778ed6d6",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-1",
+        "technique_id": "T1547",
+        "technique_name": "Boot or Logon Autostart Execution"
+    },
+    {
+        "campaign_id": 0,
+        "event_id": "4e1af8a9-1f3d-4c3f-bba0-ac27cfaeaac1",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-3",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "campaign_id": 0,
+        "event_id": "22dcd6ae-1835-4209-82f4-391aa09cf150",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-1",
+        "technique_id": "T1021",
+        "technique_name": "Remote Services"
+    },
+    {
+        "campaign_id": 0,
+        "event_id": "a2da4737-092c-4f8e-832d-6e86c8912d0b",
+        "timestamp": "2026-02-27 16:16:45.253304+00:00",
+        "host": "HOST-1",
+        "technique_id": "T1041",
+        "technique_name": "Exfiltration Over C2 Channel"
+    }
+]

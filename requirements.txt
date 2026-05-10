@@ -1,0 +1,5 @@
+pandas
+scikit-learn
+networkx
+numpy
+jinja2
